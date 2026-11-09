@@ -1,0 +1,73 @@
+{
+  "points": [
+    "O",
+    "C",
+    "A",
+    "B",
+    "A'"
+  ],
+  "collinear_groups": [
+    [
+      "O",
+      "C",
+      "A",
+      "B"
+    ]
+  ],
+  "lines": [
+    {
+      "endpoints": [
+        "O",
+        "B"
+      ],
+      "style": "solid_and_dashed"
+    },
+    {
+      "endpoints": [
+        "O",
+        "A'"
+      ],
+      "style": "dashed"
+    },
+    {
+      "endpoints": [
+        "A'",
+        "C"
+      ],
+      "style": "dashed"
+    },
+    {
+      "endpoints": [
+        "A'",
+        "A"
+      ],
+      "style": "dashed"
+    },
+    {
+      "endpoints": [
+        "A'",
+        "B"
+      ],
+      "style": "dashed"
+    }
+  ],
+  "visual_symbols": {
+    "right_angles": [
+      {
+        "vertex": "C",
+        "arms": [
+          "A'C",
+          "OC"
+        ]
+      }
+    ],
+    "parallel_arrows": [],
+    "equal_marks": [],
+    "explicit_values": []
+  },
+  "diagram_logic_forms": [
+    "PointLiesOnLine(C, Line(O, B))",
+    "PointLiesOnLine(A, Line(O, B))",
+    "Perpendicular(Line(A', C), Line(O, B))"
+  ]
+}

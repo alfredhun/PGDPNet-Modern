@@ -1,0 +1,225 @@
+{
+  "diagram_type": "multi_subfigures_coordinate_geometry",
+  "overall_description": "平面直角坐标系背景下的几何动点与图形演化综合探究题（包含图1、图2、图3三阶段演化）",
+  "global_coordinate_system": {
+    "axes": [
+      "x",
+      "y"
+    ],
+    "origin": "O",
+    "topology": [
+      "Perpendicular(Line(x_axis), Line(y_axis))",
+      "IntersectionPoint(O, Line(x_axis), Line(y_axis))"
+    ]
+  },
+  "subfigures": [
+    {
+      "sub_id": "图 1",
+      "title": "基础坐标系三角形与相交割线",
+      "points": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "O"
+      ],
+      "point_positions_relative": {
+        "A": "x_axis_negative_half (x < 0, y = 0)",
+        "B": "y_axis_positive_half (x = 0, y > 0)",
+        "C": "x_axis_positive_half (x > 0, y = 0)",
+        "O": "origin (0, 0)",
+        "D": "first_quadrant_on_segment_BC (x > 0, y > 0)",
+        "E": "y_axis_segment_OB (x = 0, y > 0)"
+      },
+      "lines": [
+        {
+          "endpoints": [
+            "A",
+            "C"
+          ],
+          "style": "solid",
+          "type": "base_line_on_x_axis"
+        },
+        {
+          "endpoints": [
+            "A",
+            "B"
+          ],
+          "style": "solid",
+          "type": "triangle_edge"
+        },
+        {
+          "endpoints": [
+            "B",
+            "C"
+          ],
+          "style": "solid",
+          "type": "triangle_edge"
+        },
+        {
+          "endpoints": [
+            "B",
+            "O"
+          ],
+          "style": "solid",
+          "type": "altitude_axis_segment"
+        },
+        {
+          "endpoints": [
+            "A",
+            "D"
+          ],
+          "style": "solid",
+          "type": "transversal_segment"
+        }
+      ],
+      "collinear_groups": [
+        [
+          "A",
+          "O",
+          "C"
+        ],
+        [
+          "B",
+          "E",
+          "O"
+        ],
+        [
+          "B",
+          "D",
+          "C"
+        ],
+        [
+          "A",
+          "E",
+          "D"
+        ]
+      ],
+      "diagram_logic_forms": [
+        "PointLiesOnLine(O, Line(A, C))",
+        "PointLiesOnLine(A, Line(x_axis))",
+        "PointLiesOnLine(C, Line(x_axis))",
+        "PointLiesOnLine(B, Line(y_axis))",
+        "PointLiesOnLine(E, Line(B, O))",
+        "PointLiesOnLine(D, Line(B, C))",
+        "IntersectionPoint(E, Line(A, D), Line(B, O))",
+        "Triangle(A, B, C)",
+        "Triangle(A, B, E)",
+        "Triangle(A, O, E)",
+        "Triangle(E, D, B)"
+      ]
+    },
+    {
+      "sub_id": "图 2",
+      "title": "添加原点连线辅助线 OD",
+      "points": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "O"
+      ],
+      "added_auxiliary_elements": [
+        {
+          "element": "Line(O, D)",
+          "endpoints": [
+            "O",
+            "D"
+          ],
+          "style": "solid",
+          "description": "连结原点 O 与 BC 边上动点 D"
+        }
+      ],
+      "collinear_groups": [
+        [
+          "A",
+          "O",
+          "C"
+        ],
+        [
+          "B",
+          "E",
+          "O"
+        ],
+        [
+          "B",
+          "D",
+          "C"
+        ],
+        [
+          "A",
+          "E",
+          "D"
+        ]
+      ],
+      "diagram_logic_forms": [
+        "PointLiesOnLine(O, Line(A, C))",
+        "PointLiesOnLine(E, Line(B, O))",
+        "PointLiesOnLine(D, Line(B, C))",
+        "IntersectionPoint(E, Line(A, D), Line(B, O))",
+        "Connect(Point(O), Point(D))",
+        "Triangle(O, B, D)",
+        "Triangle(O, C, D)",
+        "Triangle(O, E, D)"
+      ]
+    },
+    {
+      "sub_id": "图 3",
+      "title": "旋转/变换后衍生图形（点 Q 进入第三象限）",
+      "points": [
+        "P",
+        "Q",
+        "C",
+        "O"
+      ],
+      "point_positions_relative": {
+        "P": "y_axis_positive_half (x = 0, y > 0)",
+        "C": "x_axis_positive_half (x > 0, y = 0)",
+        "Q": "third_quadrant (x < 0, y < 0)",
+        "O": "origin (0, 0)"
+      },
+      "lines": [
+        {
+          "endpoints": [
+            "P",
+            "Q"
+          ],
+          "style": "solid",
+          "type": "segment"
+        },
+        {
+          "endpoints": [
+            "P",
+            "C"
+          ],
+          "style": "solid",
+          "type": "segment"
+        },
+        {
+          "endpoints": [
+            "Q",
+            "C"
+          ],
+          "style": "solid",
+          "type": "segment_crossing_y_axis"
+        }
+      ],
+      "collinear_groups": [
+        [
+          "P",
+          "O"
+        ]
+      ],
+      "diagram_logic_forms": [
+        "PointLiesOnLine(P, Line(y_axis))",
+        "PointLiesOnLine(C, Line(x_axis))",
+        "PointLiesInQuadrant(Q, 3)",
+        "Triangle(P, Q, C)",
+        "IntersectionPoint(Line(Q, C), Line(y_axis))"
+      ],
+      "transformation_semantics": "由原三角形以点 C 为旋转中心（或绕原点）发生动态旋转后，原 A 点演化至第三象限点 Q，原 B 点对应为 y 轴上的点 P"
+    }
+  ]
+}

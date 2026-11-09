@@ -1,0 +1,129 @@
+{
+  "diagram_type": "function_cartesian_graph",
+  "domain_context": "kinematics_piecewise_linear_travel_graph",
+  "axes": {
+    "x_axis": {
+      "label": "x/h",
+      "physical_quantity": "time",
+      "unit": "h",
+      "direction": "horizontal_right"
+    },
+    "y_axis": {
+      "label": "y/km",
+      "physical_quantity": "distance",
+      "unit": "km",
+      "direction": "vertical_up"
+    },
+    "origin": {
+      "symbol": "O",
+      "coords": [0, 0]
+    }
+  },
+  "axis_ticks_and_projections": {
+    "x_ticks": [
+      {"symbol": "O", "value": 0},
+      {"symbol": "1", "value": 1},
+      {"symbol": "4", "value": 4},
+      {"symbol": "E", "value": "x_E (intercept)"},
+      {"symbol": "F", "value": "x_F (terminal)"}
+    ],
+    "y_ticks": [
+      {"symbol": "O", "value": 0},
+      {"symbol": "a", "value": "a (intermediate)"},
+      {"symbol": "480", "value": 480}
+    ]
+  },
+  "critical_nodes": [
+    {
+      "name": "O",
+      "coords": [0, 0],
+      "role": "common_departure_point"
+    },
+    {
+      "name": "A",
+      "projected_x": "between 1 and 4",
+      "projected_y": "a",
+      "role": "start_of_stay_or_speed_change"
+    },
+    {
+      "name": "B",
+      "projected_x": "between 1 and 4",
+      "projected_y": "a",
+      "role": "end_of_stay_resume_travel"
+    },
+    {
+      "name": "C",
+      "projected_x": 4,
+      "projected_y": 480,
+      "role": "peak_turnaround_or_destination"
+    },
+    {
+      "name": "G",
+      "projected_x": "F",
+      "projected_y": 480,
+      "role": "destination_of_second_object"
+    },
+    {
+      "name": "E",
+      "projected_x": "E",
+      "projected_y": 0,
+      "role": "return_to_origin_time"
+    }
+  ],
+  "trajectories": [
+    {
+      "object_id": "Route_1 (Fast Vehicle / Out-and-Back)",
+      "polyline": "O -> C -> E",
+      "phases": [
+        {
+          "from": "O",
+          "to": "C",
+          "interval_x": [0, 4],
+          "interval_y": [0, 480],
+          "type": "outbound_constant_speed",
+          "slope_speed_km_per_h": 120.0
+        },
+        {
+          "from": "C",
+          "to": "E",
+          "interval_x": [4, "E"],
+          "interval_y": [480, 0],
+          "type": "return_constant_speed",
+          "slope_speed_km_per_h": "negative"
+        }
+      ]
+    },
+    {
+      "object_id": "Route_2 (Slow Vehicle with Pause / O-A-B-G)",
+      "polyline": "O -> A -> B -> G",
+      "phases": [
+        {
+          "from": "O",
+          "to": "A",
+          "type": "phase_1_travel"
+        },
+        {
+          "from": "A",
+          "to": "B",
+          "type": "horizontal_stay",
+          "property": "y_constant = a"
+        },
+        {
+          "from": "B",
+          "to": "G",
+          "type": "phase_2_travel_to_destination_480km"
+        }
+      ]
+    }
+  ],
+  "intersections": [
+    {
+      "description": "Intersection between segment(O, C) and segment(A, B)",
+      "meaning": "Meeting or overtake point"
+    },
+    {
+      "description": "Intersection between segment(C, E) and segment(B, G)",
+      "meaning": "Second encounter on the way back"
+    }
+  ]
+}

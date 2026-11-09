@@ -1,0 +1,63 @@
+{
+  "diagram_type": "multi_subfigures_coordinate_geometry",
+  "subfigures": [
+    {
+      "sub_id": "图 1",
+      "coordinate_system": {
+        "axes": ["x", "y"],
+        "origin": "O"
+      },
+      "points": ["A", "B", "C", "D", "E", "O"],
+      "collinear": [
+        ["A", "O", "C"],
+        ["B", "E", "O"],
+        ["B", "D", "C"],
+        ["A", "E", "D"]
+      ],
+      "diagram_logic_forms": [
+        "PointLiesOnLine(O, Line(A, C))",
+        "PointLiesOnLine(E, Line(B, O))",
+        "PointLiesOnLine(D, Line(B, C))",
+        "IntersectionPoint(E, Line(A, D), Line(B, O))"
+      ]
+    },
+    {
+      "sub_id": "图 2",
+      "coordinate_system": {
+        "axes": ["x", "y"],
+        "origin": "O"
+      },
+      "points": ["A", "B", "C", "D", "E", "O"],
+      "added_auxiliary_elements": [
+        {"segment": "OD", "style": "solid"}
+      ],
+      "collinear": [
+        ["A", "O", "C"],
+        ["B", "E", "O"],
+        ["B", "D", "C"],
+        ["A", "E", "D"]
+      ],
+      "diagram_logic_forms": [
+        "PointLiesOnLine(O, Line(A, C))",
+        "PointLiesOnLine(D, Line(B, C))",
+        "Line(O, D) connects Origin O and Point D"
+      ]
+    },
+    {
+      "sub_id": "图 3",
+      "coordinate_system": {
+        "axes": ["x", "y"],
+        "origin": "O"
+      },
+      "points": ["P", "Q", "C", "O"],
+      "collinear": [
+        ["P", "O", "y_axis"]
+      ],
+      "diagram_logic_forms": [
+        "PointLiesOnLine(P, Line(y_axis))",
+        "PointLiesOnLine(C, Line(x_axis))",
+        "Triangle(PQC) in coordinate plane"
+      ]
+    }
+  ]
+}
