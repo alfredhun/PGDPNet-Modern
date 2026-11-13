@@ -62,7 +62,9 @@ def export_pgdp_to_onnx():
     )
     
     # 转换为单一自包含 ONNX 文件 (内嵌所有参数权重，免除外部 .data 依赖)
+    # 强制指定 ir_version = 9 兼容 Android 移动端 ONNX Runtime (支持 Android 10~15 / MIUI / HyperOS)
     onnx_model = onnx.load(onnx_file_path, load_external_data=True)
+    onnx_model.ir_version = 9
     onnx.save_model(onnx_model, onnx_file_path, save_as_external_data=False)
     if os.path.exists(onnx_file_path + ".data"):
         try:

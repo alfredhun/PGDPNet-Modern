@@ -12,19 +12,36 @@ import java.util.Collections
  * Android 端本地 PGDPNet ONNX 推理器
  */
 class GeometryOnnxDetector(private val context: Context) {
-    private val ortEnv = OrtEnvironment.getEnvironment()
+    private var ortEnv: OrtEnvironment? = null
     private var ortSession: OrtSession? = null
+    var isInitialized = false
+        private set
+    var errorMessage: String? = null
+        private set
 
     init {
-        // 从 assets 加载导出的 0.25MB 超轻量模型
-        val modelBytes = context.assets.open("pgdp_backbone.onnx").readBytes()
-        ortSession = ortEnv.createSession(modelBytes, OrtSession.SessionOptions())
+        try {
+            ortEnv = OrtEnvironment.getEnvironment()
+            val modelBytes = context.assets.open("pgdp_backbone.onnx").readBytes()
+            val options = OrtSession.SessionOptions()
+            ortSession = ortEnv?.createSession(modelBytes, options)
+            isInitialized = true
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            errorMessage = e.localizedMessage ?: e.toString()
+        }
     }
 
     /**
      * 输入手机拍摄裁剪后的几何图形 Bitmap，在本地输出 6 级特征金字塔
      */
     fun extractFeatures(bitmap: Bitmap): Map<String, Any> {
+        val env = ortEnv
+        val session = ortSession
+        if (!isInitialized || env == null || session == null) {
+            return mapOf("error" to (errorMessage ?: "模型未完成初始化"))
+        }
+
         val width = 384
         val height = 384
         val resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, true)
@@ -52,13 +69,13 @@ class GeometryOnnxDetector(private val context: Context) {
         floatBuffer.rewind()
 
         val inputTensor = OnnxTensor.createTensor(
-            ortEnv,
+            env,
             floatBuffer,
             longArrayOf(1, 3, height.toLong(), width.toLong())
         )
 
         // 本地高通/联发科 NPU/CPU 极速推理
-        val results = ortSession?.run(Collections.singletonMap("input_image", inputTensor))
+        val results = session.run(Collections.singletonMap("input_image", inputTensor))
         
         val resultMap = mutableMapOf<String, Any>()
         results?.forEach { entry ->
@@ -68,7 +85,11 @@ class GeometryOnnxDetector(private val context: Context) {
     }
 
     fun close() {
-        ortSession?.close()
-        ortEnv.close()
+        try {
+            ortSession?.close()
+            ortEnv?.close()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
     }
 }

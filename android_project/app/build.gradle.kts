@@ -81,8 +81,8 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.2")
     implementation("androidx.camera:camera-view:1.3.2")
 
-    // ONNX Runtime Mobile
-    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.0")
+    // ONNX Runtime Mobile (1.19.2: 升级支持现代 ONNX 模型与 IR 10/9，全面兼容 Android 10~15)
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.19.2")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")

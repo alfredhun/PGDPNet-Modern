@@ -26,18 +26,26 @@ import org.json.JSONObject
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var onnxDetector: GeometryOnnxDetector
+    private var onnxDetector: GeometryOnnxDetector? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // 1. 初始化 Chaquopy (嵌入式本地 Python 引擎)
-        if (!Python.isStarted()) {
-            Python.start(AndroidPlatform(this))
+        try {
+            if (!Python.isStarted()) {
+                Python.start(AndroidPlatform(this))
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace()
         }
 
         // 2. 初始化 ONNX Runtime 几何检测引擎
-        onnxDetector = GeometryOnnxDetector(this)
+        try {
+            onnxDetector = GeometryOnnxDetector(this)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
 
         setContent {
             MaterialTheme {
@@ -45,7 +53,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val statusText = if (onnxDetector?.isInitialized == true) {
+                        "✅ ONNX 模型加载就绪 (IR v9 / MobileNetV2)"
+                    } else {
+                        "⚠️ 模型状态: ${onnxDetector?.errorMessage ?: "未完成加载"}"
+                    }
                     GeometrySolverScreen(
+                        modelStatus = statusText,
                         onSolveSampleClicked = { onSolveSample() }
                     )
                 }
@@ -59,31 +73,38 @@ class MainActivity : ComponentActivity() {
      * 2. Chaquopy 调用本地 SymPy 求解方程.
      */
     private fun onSolveSample(): Pair<List<String>, String> {
-        val py = Python.getInstance()
-        val solverModule = py.getModule("geometry_solver")
-        
-        // 模拟秋千真题数据 (A'B=2.5, A'C=2.0, AB=0.7)
-        val jsonStr = solverModule.callAttr("solve_swing_problem", "2.5", "2.0", "0.7").toString()
-        val json = JSONObject(jsonStr)
+        return try {
+            val py = Python.getInstance()
+            val solverModule = py.getModule("geometry_solver")
+            
+            // 模拟秋千真题数据 (A'B=2.5, A'C=2.0, AB=0.7)
+            val jsonStr = solverModule.callAttr("solve_swing_problem", "2.5", "2.0", "0.7").toString()
+            val json = JSONObject(jsonStr)
 
-        val stepsArray = json.getJSONArray("steps")
-        val steps = mutableListOf<String>()
-        for (i in 0 until stepsArray.length()) {
-            steps.add(stepsArray.getString(i))
+            val stepsArray = json.getJSONArray("steps")
+            val steps = mutableListOf<String>()
+            for (i in 0 until stepsArray.length()) {
+                steps.add(stepsArray.getString(i))
+            }
+            val finalAnswer = json.getString("final_answer")
+
+            Pair(steps, finalAnswer)
+        } catch (e: Throwable) {
+            Pair(listOf("推导异常: ${e.localizedMessage}"), "求解失败")
         }
-        val finalAnswer = json.getString("final_answer")
-
-        return Pair(steps, finalAnswer)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        onnxDetector.close()
+        onnxDetector?.close()
     }
 }
 
 @Composable
-fun GeometrySolverScreen(onSolveSampleClicked: () -> Pair<List<String>, String>) {
+fun GeometrySolverScreen(
+    modelStatus: String = "",
+    onSolveSampleClicked: () -> Pair<List<String>, String>
+) {
     var isProcessing by remember { mutableStateOf(false) }
     var steps by remember { mutableStateOf<List<String>>(emptyList()) }
     var answer by remember { mutableStateOf("") }
@@ -112,6 +133,9 @@ fun GeometrySolverScreen(onSolveSampleClicked: () -> Pair<List<String>, String>)
                 Text(text = "• 几何特征模型: ONNX Runtime Mobile (0.25 MB)", fontSize = 13.sp, color = Color.Gray)
                 Text(text = "• 形式化求解引擎: Chaquopy + SymPy (离线符号计算)", fontSize = 13.sp, color = Color.Gray)
                 Text(text = "• 网络要求: 断网无缝可用，0 流量消耗", fontSize = 13.sp, color = Color.Gray)
+                if (modelStatus.isNotEmpty()) {
+                    Text(text = "• 模型引擎: $modelStatus", fontSize = 13.sp, color = MaterialTheme.colorScheme.primary)
+                }
             }
         }
 
