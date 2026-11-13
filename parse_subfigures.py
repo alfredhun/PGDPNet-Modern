@@ -53,7 +53,7 @@ if __name__ == "__main__":
     try:
         res = parse_multi_subfigures(img_path)
         print(json.dumps(res, ensure_ascii=False, indent=2))
-        with open("f:/测试/subfigures_parsed.json", "w", encoding="utf-8") as f:
+        with open("subfigures_parsed.json", "w", encoding="utf-8") as f:
             json.dump(res, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"Error: {e}")

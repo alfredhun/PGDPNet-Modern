@@ -1,10 +1,11 @@
+import numpy as np
 import torch
 from geo_parse.config import cfg
 from geo_parse.modeling.detector import build_detection_model
 from geo_parse.structures.image_list import to_image_list
 
 def test_modernized_pipeline():
-    cfg.merge_from_file('f:/测试/PGDP/configs/PGDP5K/geo_MNV2_FPN.yaml')
+    cfg.merge_from_file('PGDP/configs/PGDP5K/geo_MNV2_FPN.yaml')
     cfg.MODEL.DEVICE = 'cpu'
     
     print("正在构建现代化 PGDPNet 模型...")

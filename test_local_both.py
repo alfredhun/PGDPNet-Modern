@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import cv2
 from torchvision import transforms as T
@@ -8,12 +9,12 @@ from geo_parse.structures.image_list import to_image_list
 def test_local_pgdp(img_path, title):
     print("=" * 60)
     print(f"[*] 本地 PGDPNet 神经特征抽取: {title}")
-    cfg.merge_from_file('f:/测试/PGDP/configs/PGDP5K/geo_MNV2_FPN.yaml')
+    cfg.merge_from_file('PGDP/configs/PGDP5K/geo_MNV2_FPN.yaml')
     cfg.MODEL.DEVICE = 'cpu'
     model = build_detection_model(cfg)
     model.eval()
 
-    img = cv2.imread(img_path)
+    img = cv2.imdecode(np.fromfile(img_path, dtype=np.uint8), cv2.IMREAD_COLOR)
     h, w, _ = img.shape
     transform = T.Compose([
         T.ToTensor(),

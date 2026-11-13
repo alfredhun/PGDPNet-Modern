@@ -1,0 +1,104 @@
+{
+  "problem_meta": {
+    "title": "初中数学勾股定理应用：秋千摆动几何模型",
+    "grade_level": "Grade 8 / Junior High",
+    "topic": "Pythagorean Theorem & Circle Arc Swing"
+  },
+  "text_content": {
+    "raw_text": "如图，当秋千 $OA$ 静止时，最低点 $A$ 离地面的距离 $AB$ 为 $0.7\\text{ m}$，当秋千摆动到 $OA'$ 位置时，点 $A'$ 与点 $B$ 的距离 $A'B$ 为 $2.5\\text{ m}$，点 $A'$ 水平移动的距离 $A'C$ 为 $2\\text{ m}$。求秋千 $OA$ 的长。",
+    "target": "求秋千 $OA$ 的长（即摆长 $R$）"
+  },
+  "geometry_elements": {
+    "points": [
+      "O",
+      "A",
+      "B",
+      "C",
+      "A'"
+    ],
+    "segments": [
+      {
+        "name": "OB",
+        "type": "vertical_line_segment",
+        "style": "solid_and_dashed"
+      },
+      {
+        "name": "OA",
+        "type": "initial_vertical_swing_rope",
+        "style": "solid"
+      },
+      {
+        "name": "OA'",
+        "type": "deflected_swing_rope",
+        "style": "dashed"
+      },
+      {
+        "name": "A'C",
+        "type": "horizontal_displacement",
+        "style": "dashed"
+      },
+      {
+        "name": "A'B",
+        "type": "distance_to_ground_lowest_point",
+        "style": "dashed"
+      },
+      {
+        "name": "AB",
+        "type": "ground_clearance_lowest_position",
+        "style": "dashed"
+      }
+    ],
+    "arcs": [
+      {
+        "name": "Arc(A', A)",
+        "type": "swing_trajectory_arc",
+        "style": "dashed",
+        "center": "O",
+        "radius": "OA"
+      }
+    ],
+    "ground": {
+      "name": "Line(Ground)",
+      "style": "solid_horizontal",
+      "point_on_ground": "B"
+    },
+    "visual_symbols": {
+      "right_angles": [
+        {
+          "vertex": "C",
+          "arms": [
+            "A'C",
+            "OB"
+          ],
+          "symbol_type": "explicit_square_mark"
+        }
+      ]
+    }
+  },
+  "collinear_groups": [
+    [
+      "O",
+      "C",
+      "A",
+      "B"
+    ]
+  ],
+  "diagram_logic_forms": [
+    "PointLiesOnLine(C, Line(O, B))",
+    "PointLiesOnLine(A, Line(O, B))",
+    "Perpendicular(Line(A', C), Line(O, B))",
+    "Perpendicular(Line(O, B), Line(Ground))",
+    "PointLiesOnGround(B)",
+    "Equals(LengthOf(Line(O, A')), LengthOf(Line(O, A)))",
+    "Equals(LengthOf(Line(A, B)), 0.7)",
+    "Equals(LengthOf(Line(A', B)), 2.5)",
+    "Equals(LengthOf(Line(A', C)), 2.0)",
+    "Find(LengthOf(Line(O, A)))"
+  ],
+  "solver_solution": {
+    "step_1_Rt_triangle_A_prime_C_B": "BC = sqrt(2.5^2 - 2^2) = 1.5 m",
+    "step_2_collinear_AC": "AC = BC - AB = 1.5 - 0.7 = 0.8 m",
+    "step_3_equation_Rt_triangle_O_A_prime_C": "R^2 = (R - 0.8)^2 + 2^2",
+    "final_answer": "2.9 m (29/10 m)"
+  }
+}

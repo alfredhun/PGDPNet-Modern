@@ -1,0 +1,41 @@
+name: CI Build & Automated Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: "pip"
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+        pip install onnx onnxruntime onnxscript
+        pip install -r requirements.txt
+        pip install -e ./PGDP
+
+    - name: Test 1 - PGDPNet Neural Forward Pass
+      run: |
+        python test_forward.py
+
+    - name: Test 2 - ONNX Mobile Model Export & Precision Check
+      run: |
+        python export_onnx.py
+
+    - name: Test 3 - Neuro-Symbolic Swing Geometry Problem Solver
+      run: |
+        python parse_swing_problem.py

@@ -1,3 +1,4 @@
+import numpy as np
 """
 run_diagram_pipeline.py - 现代化 PGDPNet 与全要素几何解析实测运行脚本
 """
@@ -30,7 +31,7 @@ def run_pipeline(image_path: str):
     # 第一部分：本地现代化 PGDPNet 深度学习主干网络推理验证
     # -------------------------------------------------------------
     print("\n【阶段 1】启动本地重构的 PGDPNet 深度神经网络...")
-    cfg_file = 'f:/测试/PGDP/configs/PGDP5K/geo_MNV2_FPN.yaml'
+    cfg_file = 'PGDP/configs/PGDP5K/geo_MNV2_FPN.yaml'
     cfg.merge_from_file(cfg_file)
     cfg.MODEL.DEVICE = 'cpu'
     
@@ -40,7 +41,7 @@ def run_pipeline(image_path: str):
     print(f"  [OK] PGDPNet 网络实例化成功 (参数总量: {sum(p.numel() for p in model.parameters()):,})")
 
     # 读取图像并前向计算
-    img_bgr = cv2.imread(image_path)
+    img_bgr = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), cv2.IMREAD_COLOR)
     if img_bgr is None:
         raise FileNotFoundError(f"无法读取图片: {image_path}")
     h, w, c = img_bgr.shape
@@ -71,7 +72,7 @@ def run_pipeline(image_path: str):
     print("=============================================================")
 
     # 保存结果到本地文件
-    output_json_path = "f:/测试/parse_result.json"
+    output_json_path = "parse_result.json"
     with open(output_json_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     print(f"\n[OK] 完整结构化结果已成功保存到: {output_json_path}")

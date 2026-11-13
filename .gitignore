@@ -34,6 +34,9 @@ ENV/
 .DS_Store
 Thumbs.db
 
+# Archives
+*.zip
+
 # Large Cache & Checkpoints
 *.pth
 *.pt
