@@ -224,13 +224,8 @@ fun GeometrySolverScreen(
     ) { uri: Uri? ->
         uri?.let {
             val bitmap = try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, it)) { decoder, _, _ ->
-                        decoder.allocatorSchema = ImageDecoder.ALLOCATOR_SOFTWARE
-                        decoder.isMutableRequired = true
-                    }
-                } else {
-                    MediaStore.Images.Media.getBitmap(context.contentResolver, it)
+                context.contentResolver.openInputStream(it)?.use { stream ->
+                    BitmapFactory.decodeStream(stream)
                 }
             } catch (t: Throwable) {
                 null
