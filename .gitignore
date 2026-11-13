@@ -47,5 +47,7 @@ training_dir/
 android_project/.gradle/
 android_project/app/build/
 android_project/build/
+downloaded_artifacts/
 *.apk
 *.aab
+*.whl
