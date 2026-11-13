@@ -40,7 +40,7 @@ jobs:
 
     - name: Test 3 - Neuro-Symbolic Geometry Problem Solver
       run: |
-        python parse_swing_problem.py
+        python test_geometry_solver.py
 
     - name: Compile Python Wheel Package
       run: |

@@ -148,22 +148,36 @@ def solve_geometry(ocr_text):
             n1, n2 = nums[0], nums[1]
             max_n, min_n = max(n1, n2), min(n1, n2)
 
-            # 判断求斜边还是求直角边
-            if "斜边" in norm or "c" in target.lower():
+            # 根据直角定斜边 (若 ∠C=90°, 斜边为 AB; 若 ∠B=90°, 斜边为 AC; 若 ∠A=90°, 斜边为 BC)
+            hyp_side_name = None
+            for a_k, a_v in angles.items():
+                if a_v == 90:
+                    if a_k == "C": hyp_side_name = "AB"
+                    elif a_k == "B": hyp_side_name = "AC"
+                    elif a_k == "A": hyp_side_name = "BC"
+
+            # 目标是否为求斜边
+            is_seeking_hypotenuse = ("求斜边" in norm or "斜边长" in norm or target.lower() == "c" or (hyp_side_name and target == hyp_side_name))
+            
+            # 若已知边中已经包含了斜边，则目标必然是求直角边
+            if hyp_side_name and hyp_side_name in lengths:
+                is_seeking_hypotenuse = False
+
+            if is_seeking_hypotenuse:
                 hyp = math.sqrt(n1**2 + n2**2)
                 return json.dumps({
                     "problem_type": "直角三角形勾股定理 (求斜边)",
-                    "identified_conditions": [f"直角边 a = {n1}", f"直角边 b = {n2}"],
+                    "identified_conditions": [f"直角边 a = {min_n}", f"直角边 b = {max_n}"],
                     "theorems_used": ["勾股定理: a² + b² = c² (两直角边平方和等于斜边平方)"],
                     "steps": [
-                        f"1. 确认两直角边长: a = {n1}, b = {n2}",
+                        f"1. 确认两直角边长: a = {min_n}, b = {max_n}",
                         f"2. 应用【勾股定理】: 斜边 c = √(a² + b²)",
-                        f"3. 代入计算: c = √({n1}² + {n2}²) = √({n1**2 + n2**2:.2f}) = {hyp:.2f}"
+                        f"3. 代入计算: c = √({min_n}² + {max_n}²) = √({min_n**2 + max_n**2:.2f}) = {hyp:.2f}"
                     ],
                     "final_answer": f"斜边 {target} = {hyp:.2f}"
                 }, ensure_ascii=False)
             else:
-                # 默认最大边为斜边，求另一直角边
+                # 默认较长边为斜边，求另一直角边
                 leg_sq = max_n**2 - min_n**2
                 leg = math.sqrt(leg_sq)
                 return json.dumps({
