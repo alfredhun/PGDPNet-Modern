@@ -121,16 +121,18 @@ class GEOFeatureExtractor(nn.Module):
             if labels[index]==2: feat_vis = self.line_vis(feat_vis)
             if labels[index]==3: feat_vis = self.circle_vis(feat_vis)
 
-            if self.USE_LOC:
-                if labels[index]==1: 
+            if self.USE_LOC and index < len(locs):
+                if labels[index]==1 and len(locs[index]) > 0: 
                     feat_loc = torch.tensor(locs[index][0], dtype=torch.float32).to(device)
                     feat_loc = self.point_loc(feat_loc/self.dist_meas)
-                if labels[index]==2:
+                elif labels[index]==2 and len(locs[index]) > 1:
                     feat_loc = torch.tensor(locs[index][0]+locs[index][1], dtype=torch.float32).to(device)
                     feat_loc = self.line_loc(feat_loc/self.dist_meas)
-                if labels[index]==3:
+                elif labels[index]==3 and len(locs[index]) > 1:
                     feat_loc = torch.tensor(locs[index][0]+[locs[index][1]], dtype=torch.float32).to(device)
                     feat_loc = self.circle_loc(feat_loc/self.dist_meas)
+                else:
+                    feat_loc = torch.zeros(128, device=device)
                 feat_list.append(feat_vis.mean(0) + feat_loc)
             else:
                 feat_list.append(feat_vis.mean(0))
