@@ -1,13 +1,15 @@
-name: CI Build & Automated Tests
+name: CI & Compilation Workflow
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  python-test-and-package:
+    name: 🐍 Python Tests & Wheel Compilation
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +26,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-        pip install onnx onnxruntime onnxscript
+        pip install onnx onnxruntime onnxscript sympy build
         pip install -r requirements.txt
         pip install -e ./PGDP
 
@@ -32,10 +34,58 @@ jobs:
       run: |
         python test_forward.py
 
-    - name: Test 2 - ONNX Mobile Model Export & Precision Check
+    - name: Test 2 - ONNX Mobile Model Export & Validation
       run: |
         python export_onnx.py
 
-    - name: Test 3 - Neuro-Symbolic Swing Geometry Problem Solver
+    - name: Test 3 - Neuro-Symbolic Geometry Problem Solver
       run: |
         python parse_swing_problem.py
+
+    - name: Compile Python Wheel Package
+      run: |
+        python -m build --sdist --wheel ./PGDP
+
+    - name: Upload Python Package Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: PGDPNet-Modern-Python-Package
+        path: PGDP/dist/*
+        retention-days: 7
+
+  android-apk-build:
+    name: 📱 Android APK Compilation & Packaging
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: "17"
+
+    - name: Set up Python for Chaquopy
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: "8.4"
+
+    - name: Compile Android Debug APK
+      working-directory: android_project
+      run: |
+        gradle wrapper --gradle-version 8.4
+        gradle assembleDebug --stacktrace
+
+    - name: Upload Android Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: GeometrySolver-Android-Debug-APK
+        path: android_project/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7

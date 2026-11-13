@@ -54,15 +54,24 @@ def export_pgdp_to_onnx():
         dummy_input,
         onnx_file_path,
         export_params=True,
-        opset_version=14,
+        opset_version=18,
         do_constant_folding=True,
         input_names=input_names,
         output_names=output_names,
         dynamic_axes=dynamic_axes
     )
     
+    # 转换为单一自包含 ONNX 文件 (内嵌所有参数权重，免除外部 .data 依赖)
+    onnx_model = onnx.load(onnx_file_path, load_external_data=True)
+    onnx.save_model(onnx_model, onnx_file_path, save_as_external_data=False)
+    if os.path.exists(onnx_file_path + ".data"):
+        try:
+            os.remove(onnx_file_path + ".data")
+        except Exception:
+            pass
+
     file_size_mb = os.path.getsize(onnx_file_path) / (1024 * 1024)
-    print(f"  ✓ 导出成功！ONNX 模型文件大小: {file_size_mb:.2f} MB")
+    print(f"  ✓ 导出成功！自包含单文件 ONNX 大小: {file_size_mb:.2f} MB")
 
     # 4. 校验 ONNX 结构合法性
     print("\n[3/4] 正在校验 ONNX 结构完整性...")
