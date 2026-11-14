@@ -111,12 +111,12 @@ def main():
     out_dir = "./downloaded_artifacts"
     os.makedirs(out_dir, exist_ok=True)
     
-    # 1. 下载包含真实相机拍照 + 相册读取 + 通用几何求解器的最新纯净版 APK
-    # Run: 43540936917, ID: 14092291353, 71918920 bytes
-    download_and_extract_artifact(14092291353, "GeometrySolver-Android-Debug-APK", 71918920, out_dir)
+    # 1. 下载包含真实相机拍照 + 相册读取 + 原版 PGDP/InterGPS 17项几何定理引擎的最新纯净版 APK
+    # Run: 43547710055, ID: 14095210878, 72260922 bytes
+    download_and_extract_artifact(14095210878, "GeometrySolver-Android-Debug-APK", 72260922, out_dir)
     
-    # 2. 下载 Python Package (Run: 43540936917, ID: 14092356018, 323198 bytes)
-    download_and_extract_artifact(14092356018, "PGDPNet-Modern-Python-Package", 323198, out_dir)
+    # 2. 下载 Python Package (Run: 43547710055, ID: 14093824993, 323175 bytes)
+    download_and_extract_artifact(14093824993, "PGDPNet-Modern-Python-Package", 323175, out_dir)
 
 if __name__ == "__main__":
     main()
