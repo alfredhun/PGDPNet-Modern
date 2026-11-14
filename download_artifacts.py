@@ -112,11 +112,11 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     
     # 1. 下载包含真实相机拍照 + 相册读取 + 通用几何求解器的最新纯净版 APK
-    # Run: 43469401335, ID: 14061140192, 71915956 bytes
-    download_and_extract_artifact(14061140192, "GeometrySolver-Android-Debug-APK", 71915956, out_dir)
+    # Run: 43540936917, ID: 14092291353, 71918920 bytes
+    download_and_extract_artifact(14092291353, "GeometrySolver-Android-Debug-APK", 71918920, out_dir)
     
-    # 2. 下载 Python Package (Run: 43469401335, ID: 14060151430, 323246 bytes)
-    download_and_extract_artifact(14060151430, "PGDPNet-Modern-Python-Package", 323246, out_dir)
+    # 2. 下载 Python Package (Run: 43540936917, ID: 14092356018, 323198 bytes)
+    download_and_extract_artifact(14092356018, "PGDPNet-Modern-Python-Package", 323198, out_dir)
 
 if __name__ == "__main__":
     main()
