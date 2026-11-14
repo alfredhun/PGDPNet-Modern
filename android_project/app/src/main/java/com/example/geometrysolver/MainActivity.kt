@@ -380,6 +380,72 @@ fun GeometrySolverScreen(
                     shape = RoundedCornerShape(8.dp)
                 )
 
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "💡 经典中考真题演练 (点击快捷填入并推导):", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium)
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val sample1 = "在△ABC中,AB=AC=13,BC=10,AD⊥BC,求AD的长."
+                    val sample2 = "在Rt△ABC中,∠C=90°,D为AB中点,CD=4,求AB的长."
+                    val sample3 = "在△ABC中,AB=5,AC=12,BC=13,求高AD."
+                    val sample4 = "如图,DE//BC,AD=2,DB=3,AE=4,求AC的长."
+
+                    SuggestionChip(
+                        onClick = {
+                            recognizedText = sample1
+                            scope.launch {
+                                isProcessing = true
+                                runReasoningPipeline(sample1)
+                                isProcessing = false
+                                statusStage = ""
+                            }
+                        },
+                        label = { Text("等腰三线合一", fontSize = 11.sp) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    SuggestionChip(
+                        onClick = {
+                            recognizedText = sample2
+                            scope.launch {
+                                isProcessing = true
+                                runReasoningPipeline(sample2)
+                                isProcessing = false
+                                statusStage = ""
+                            }
+                        },
+                        label = { Text("斜边中线", fontSize = 11.sp) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    SuggestionChip(
+                        onClick = {
+                            recognizedText = sample3
+                            scope.launch {
+                                isProcessing = true
+                                runReasoningPipeline(sample3)
+                                isProcessing = false
+                                statusStage = ""
+                            }
+                        },
+                        label = { Text("等面积求高", fontSize = 11.sp) },
+                        modifier = Modifier.weight(1f)
+                    )
+                    SuggestionChip(
+                        onClick = {
+                            recognizedText = sample4
+                            scope.launch {
+                                isProcessing = true
+                                runReasoningPipeline(sample4)
+                                isProcessing = false
+                                statusStage = ""
+                            }
+                        },
+                        label = { Text("平行线比例", fontSize = 11.sp) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {

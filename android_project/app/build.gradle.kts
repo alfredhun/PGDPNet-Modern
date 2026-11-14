@@ -26,6 +26,8 @@ android {
                 version = "3.10"
                 pip {
                     install("sympy")
+                    install("pyparsing")
+                    install("kanren")
                 }
             }
         }
