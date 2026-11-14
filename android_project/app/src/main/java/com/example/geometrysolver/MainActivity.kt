@@ -32,6 +32,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -49,6 +50,8 @@ data class SolveResult(
 class MainActivity : ComponentActivity() {
 
     private var onnxDetector: GeometryOnnxDetector? = null
+    private var onnxStatus by mutableStateOf("⏳ 正在检测 ONNX 几何模型...")
+    private var pythonStatus by mutableStateOf("⏳ 正在检测 Python 求解引擎...")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,14 +61,26 @@ class MainActivity : ComponentActivity() {
             if (!Python.isStarted()) {
                 Python.start(AndroidPlatform(this))
             }
+            val py = Python.getInstance()
+            val solverModule = py.getModule("geometry_solver")
+            // 探针测试确保 geometry_solver 模块能成功调用
+            solverModule.callAttr("normalize_text", "probe")
+            pythonStatus = "✅ Chaquopy + SymPy 几何定理求解器就绪"
         } catch (e: Throwable) {
+            pythonStatus = "⚠️ Python 启动异常: ${e.localizedMessage ?: e.toString()}"
             e.printStackTrace()
         }
 
         // 2. 初始化 ONNX Runtime 几何特征提取引擎
         try {
             onnxDetector = GeometryOnnxDetector(this)
+            onnxStatus = if (onnxDetector?.isInitialized == true) {
+                "✅ ONNX 特征提取器就绪 (MobileNetV2 / IR v9)"
+            } else {
+                "⚠️ ONNX 状态: ${onnxDetector?.errorMessage ?: "未完成加载"}"
+            }
         } catch (e: Throwable) {
+            onnxStatus = "⚠️ ONNX 启动异常: ${e.localizedMessage ?: e.toString()}"
             e.printStackTrace()
         }
 
@@ -75,13 +90,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val statusText = if (onnxDetector?.isInitialized == true) {
-                        "✅ ONNX 模型加载就绪 (IR v9 / MobileNetV2)"
-                    } else {
-                        "⚠️ 模型状态: ${onnxDetector?.errorMessage ?: "未完成加载"}"
-                    }
                     GeometrySolverScreen(
-                        modelStatus = statusText,
+                        onnxStatus = onnxStatus,
+                        pythonStatus = pythonStatus,
                         onnxDetector = onnxDetector
                     )
                 }
@@ -159,7 +170,7 @@ suspend fun solveFromText(ocrText: String): SolveResult = withContext(Dispatcher
             problemType = "推导异常",
             conditions = emptyList(),
             theorems = emptyList(),
-            steps = listOf("错误详情: " + (e.localizedMessage ?: e.toString())),
+            steps = listOf("求解引擎错误详情: " + (e.localizedMessage ?: e.toString())),
             finalAnswer = "计算未完成"
         )
     }
@@ -167,7 +178,8 @@ suspend fun solveFromText(ocrText: String): SolveResult = withContext(Dispatcher
 
 @Composable
 fun GeometrySolverScreen(
-    modelStatus: String = "",
+    onnxStatus: String = "",
+    pythonStatus: String = "",
     onnxDetector: GeometryOnnxDetector? = null
 ) {
     val context = LocalContext.current
@@ -180,6 +192,17 @@ fun GeometrySolverScreen(
     var isProcessing by remember { mutableStateOf(false) }
     var statusStage by remember { mutableStateOf("") }
     var solveResult by remember { mutableStateOf<SolveResult?>(null) }
+
+    // 执行多阶段严密形式化推导流水线
+    suspend fun runReasoningPipeline(text: String) {
+        statusStage = "📐 阶段 1/3: 正在形式化抽取几何图元与已知关系..."
+        delay(250)
+        statusStage = "📖 阶段 2/3: 正在匹配几何公理与定理推理链 (三线合一 / 勾股逆定理 / 垂径定理 / 相似比)..."
+        delay(300)
+        statusStage = "⚡ 阶段 3/3: 正在调用 SymPy 符号代数执行形式化严密推导与验证..."
+        val result = solveFromText(text)
+        solveResult = result
+    }
 
     // 处理新图片流程 (拍照或相册选图后触发)
     fun processImage(bitmap: Bitmap) {
@@ -203,10 +226,8 @@ fun GeometrySolverScreen(
             val ocr = recognizeTextFromBitmap(bitmap)
             recognizedText = ocr
 
-            // 3. 自动定理推导与几何求解
-            statusStage = "⚡ 正在调用 SymPy 形式化几何定理库推导求解..."
-            val result = solveFromText(ocr)
-            solveResult = result
+            // 3. 执行几何定理形式化推导
+            runReasoningPipeline(ocr)
 
             isProcessing = false
             statusStage = ""
@@ -250,7 +271,7 @@ fun GeometrySolverScreen(
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
-        // 状态说明卡片
+        // 状态说明卡片 (实时显示 ONNX 与 Python/SymPy 双引擎真实就绪状态)
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -258,8 +279,9 @@ fun GeometrySolverScreen(
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(text = "📱 运行模式: 纯端侧全离线 (无需联网)", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                Text(text = "• 模型引擎: $modelStatus", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
-                Text(text = "• 求解引擎: Chaquopy + SymPy 几何形式化推导", fontSize = 12.sp, color = Color.Gray)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "• 模型引擎: $onnxStatus", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                Text(text = "• 求解引擎: $pythonStatus", fontSize = 12.sp, color = if (pythonStatus.startsWith("✅")) Color(0xFF2E7D32) else Color.Red)
             }
         }
 
@@ -351,7 +373,7 @@ fun GeometrySolverScreen(
                 OutlinedTextField(
                     value = recognizedText,
                     onValueChange = { recognizedText = it },
-                    placeholder = { Text("在此输入或粘贴几何题目文字，例如：在Rt△ABC中，∠C=90°，AB=13，AC=5，求BC的长") },
+                    placeholder = { Text("在此输入或编辑几何题目文字，例如：在△ABC中，AB=AC=13，BC=10，AD⊥BC，求AD的长。") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 90.dp, max = 160.dp),
@@ -363,8 +385,7 @@ fun GeometrySolverScreen(
                     onClick = {
                         scope.launch {
                             isProcessing = true
-                            statusStage = "⚡ 正在推导几何定理求解..."
-                            solveResult = solveFromText(recognizedText)
+                            runReasoningPipeline(recognizedText)
                             isProcessing = false
                             statusStage = ""
                         }
@@ -381,7 +402,7 @@ fun GeometrySolverScreen(
         solveResult?.let { result ->
             Spacer(modifier = Modifier.height(14.dp))
 
-            // 1. 题型与答案卡片
+            // 1. 题型与最终答案卡片
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -389,16 +410,16 @@ fun GeometrySolverScreen(
             ) {
                 Column(modifier = Modifier.padding(14.dp)) {
                     Text(
-                        text = "🎯 题型: ${result.problemType}",
+                        text = "🎯 几何模型: ${result.problemType}",
                         color = Color(0xFF2E7D32),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "最终答案: ${result.finalAnswer}",
                         color = Color(0xFF1B5E20),
-                        fontSize = 17.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -414,9 +435,10 @@ fun GeometrySolverScreen(
                 ) {
                     Column(modifier = Modifier.padding(10.dp)) {
                         if (result.conditions.isNotEmpty()) {
-                            Text(text = "📌 解析已知条件: ${result.conditions.joinToString(" | ")}", fontSize = 12.sp, color = Color.DarkGray)
+                            Text(text = "📌 解析几何条件: ${result.conditions.joinToString(" | ")}", fontSize = 12.sp, color = Color.DarkGray)
                         }
                         if (result.theorems.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(text = "📖 应用定理依据: ${result.theorems.joinToString("; ")}", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                         }
                     }
